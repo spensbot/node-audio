@@ -1,0 +1,28 @@
+{
+    "main": "lib/binding.js",
+    "dependencies": {
+        "node-addon-api": "^1.1.0"
+    },
+    "scripts": {
+        "pretest": "tsc",
+        "test": "node --napi-modules ./test/test_binding.js"
+    },
+    "gypfile": true,
+    "name": "node-audio",
+    "version": "1.0.0",
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com/spensbot/node-audio.git"
+    },
+    "author": "Spenser Saling",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/spensbot/node-audio/issues"
+    },
+    "homepage": "https://github.com/spensbot/node-audio#readme",
+    "description": "",
+    "devDependencies": {
+        "@types/node": "^7.0.22",
+        "typescript": "^2.3.3"
+    }
+}
