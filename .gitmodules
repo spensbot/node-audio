@@ -1,0 +1,6 @@
+[submodule "src/btrack"]
+	path = src/btrack
+	url = https://github.com/adamstark/BTrack.git
+[submodule "src/jack2"]
+	path = src/jack2
+	url = https://github.com/jackaudio/jack2.git

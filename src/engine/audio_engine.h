@@ -1,5 +1,8 @@
 #pragma once
 
+#include <BTrack.h>
+#include <jack/jack.h>
+
 #include <string>
 #include <vector>
 #include <optional>
