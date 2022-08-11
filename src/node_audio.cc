@@ -1,3 +1,4 @@
+#define MINIAUDIO_IMPLEMENTATION
 #include "node_audio.h"
 
 using namespace Napi;
@@ -20,13 +21,21 @@ void NodeAudio::connect(const Napi::CallbackInfo& info) {
 
     Napi::String audio_port_id = info[0].As<Napi::String>();
 
+    std::cout << "pre _engine.connect" << std::endl;
     _engine.connect(audio_port_id.Utf8Value());
+    std::cout << "post _engine.connect" << std::endl;
 }
 
 Napi::Value NodeAudio::getConnectionState(const Napi::CallbackInfo& info) {
     auto env = info.Env();
+    auto state = _engine.getConnectionState();
+    auto len = state.available.size();
     Napi::Object obj = Napi::Object::New(env);
-    obj.Set("available", Napi::Array::New(env));
+    Napi::Array available = Napi::Array::New(env, len);
+    for (auto i=0 ; i<len; i++) {
+        available[i] = Napi::String::New(env, state.available[i].name.c_str());
+    }
+    obj.Set("available", available);
     obj.Set("connected", env.Null());
 
     return obj;
