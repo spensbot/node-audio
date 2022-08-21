@@ -1,6 +1,6 @@
-[submodule "src/btrack"]
-	path = src/btrack
-	url = https://github.com/adamstark/BTrack.git
-[submodule "src/jack2"]
-	path = src/jack2
-	url = https://github.com/jackaudio/jack2.git
+[submodule "src/aubio"]
+	path = src/aubio
+	url = git@github.com:aubio/aubio.git
+[submodule "src/portaudio"]
+	path = src/portaudio
+	url = git@github.com:PortAudio/portaudio.git

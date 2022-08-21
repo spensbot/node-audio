@@ -1,6 +1,8 @@
 #pragma once
 
 #include "miniaudio.h"
+#include <aubio.h>
+// #include <portaudio.h>
 #include <cstdint>
 #include <optional>
 #include <string>

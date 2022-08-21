@@ -4,6 +4,11 @@ An audio analysis engine for node.js
 
 ## Developers
 
+`brew install portaudio`
+`brew install aubio`
+`brew install libsamplerate`
+`brew install fftw`
+
 `git clone https://github.com/spensbot/node-audio.git` <-- download the repo locally
 
 `git submodule update --init --recursive` <-- download submodules
