@@ -1,6 +1,8 @@
 #pragma once
 
 #include "io/io_manager.h"
+#include "session_state.h"
+#include "dsp/dsp_manager.h"
 
 #include <string>
 #include <vector>
@@ -12,20 +14,15 @@ struct ConnectionState {
   std::optional<DeviceInfo> connected;
 };
 
-struct SessionState {
-  float bpm;
-  float beats;
-};
-
 class AudioEngine: public IoListener {
   public: 
-    AudioEngine(): _ioManager(IoManager::New(*this)) {}
+    AudioEngine()
+    : _ioManager(IoManager::New(*this))
+    , _dspManager(std::make_unique<DspManager>()) 
+    {}
 
     SessionState getSessionState() {
-      return SessionState {
-        0.0,
-        0.0
-      };
+      return _dspManager->sessionState();
     }
 
     ConnectionState getConnectionState() {
@@ -46,10 +43,10 @@ class AudioEngine: public IoListener {
 
     // AUDIO THREAD. Realtime-safe code only
     void audio_callback(float* input, float* output, uint32_t frame_count) override {
-      std::cout << "audio_callback()" << std::endl;
+      _dspManager->update(input, frame_count);
     }
   
   private:
-    // Where the good stuff'll go
     std::unique_ptr<IoManager> _ioManager;
+    std::unique_ptr<DspManager> _dspManager;
 };

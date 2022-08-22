@@ -10,8 +10,8 @@ function testBasic() {
   let connectionState = nodeAudio.getConnectionState()
   console.log(connectionState)
 
-  // let sessionState = nodeAudio.getSessionState()
-  // console.log(sessionState)
+  let sessionState = nodeAudio.getSessionState()
+  console.log(sessionState)
 
   setTimeout(testBasic, 1000)
 }
