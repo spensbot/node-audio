@@ -1,7 +1,6 @@
 #pragma once
 
-#include "miniaudio.h"
-#include "io_manager.h"
+#include "io/io_manager.h"
 
 #include <string>
 #include <vector>
@@ -18,9 +17,9 @@ struct SessionState {
   float beats;
 };
 
-class AudioEngine: public IoListener {
+class AudioEngine {
   public: 
-    AudioEngine(): _ioManager(IoManager::New(*this)) {}
+    AudioEngine(): _ioManager(IoManager::New()) {}
 
     SessionState getSessionState() {
       return SessionState {
@@ -31,21 +30,21 @@ class AudioEngine: public IoListener {
 
     ConnectionState getConnectionState() {
       const auto available_inputs = _ioManager ? _ioManager->list_inputs() : std::vector<DeviceInfo> {};
+      const auto connected = _ioManager ? _ioManager->connected() : std::nullopt;
       return ConnectionState {
         available_inputs,
-        std::nullopt,
+        connected,
       };
     }
 
     void connect(std::string audioPortId) {
-      if (_ioManager) _ioManager->connect_input();
-    }
-
-    void audio_callback(float* input, float* output, uint32_t frame_count) override {
-      std::cout << "audio_callback() !!!" << std::endl;
+      auto state = getConnectionState();
+      if (state.available.size() > 0 && !state.connected) {
+        if (_ioManager) _ioManager->connect_input(state.available[0]);  
+      }
     }
   
   private:
-    std::optional<IoManager> _ioManager;
     // Where the good stuff'll go
+    std::unique_ptr<IoManager> _ioManager;
 };

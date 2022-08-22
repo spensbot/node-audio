@@ -4,12 +4,15 @@ const assert = require("assert")
 assert(NodeAudio, "The expected module is undefined")
 
 const nodeAudio = new NodeAudio()
-// nodeAudio.connect("this_port_does_not_exist")
+nodeAudio.connect("Nothing")
 
 function testBasic() {
-  console.log(nodeAudio.getConnectionState())
-  console.log(nodeAudio.getSessionState())
-  console.log("timeout")
+  let connectionState = nodeAudio.getConnectionState()
+  console.log(connectionState)
+
+  // let sessionState = nodeAudio.getSessionState()
+  // console.log(sessionState)
+
   setTimeout(testBasic, 1000)
 }
 

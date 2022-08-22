@@ -21,9 +21,7 @@ void NodeAudio::connect(const Napi::CallbackInfo& info) {
 
     Napi::String audio_port_id = info[0].As<Napi::String>();
 
-    std::cout << "pre _engine.connect" << std::endl;
     _engine.connect(audio_port_id.Utf8Value());
-    std::cout << "post _engine.connect" << std::endl;
 }
 
 Napi::Value NodeAudio::getConnectionState(const Napi::CallbackInfo& info) {
@@ -36,7 +34,12 @@ Napi::Value NodeAudio::getConnectionState(const Napi::CallbackInfo& info) {
         available[i] = Napi::String::New(env, state.available[i].name.c_str());
     }
     obj.Set("available", available);
-    obj.Set("connected", env.Null());
+
+    if (state.connected) {
+        obj.Set("connected", Napi::String::New(env, state.connected->name.c_str()));
+    } else {
+        obj.Set("connected", env.Null());
+    }
 
     return obj;
 }

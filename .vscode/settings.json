@@ -75,6 +75,7 @@
     "utility": "cpp",
     "stop_token": "cpp",
     "cinttypes": "cpp",
-    "iostream": "cpp"
+    "iostream": "cpp",
+    "__functional_base": "cpp"
   }
 }
