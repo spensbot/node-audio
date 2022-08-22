@@ -7,16 +7,19 @@
 
 class IoListener {
 public:
+  // CALLED BY AUDIO THREAD!!! DON'T YOU DARE BLOCK IN HERE. 
+  //    NO MEMORY MANAGEMENT
+  //    NO LOCKS
+  //    NO IO
   virtual void audio_callback(float* input, float* output, uint32_t frame_count) = 0;
 };
 
 // I don't like this, but I'm not sure how else to have data_callback reference something
-static IoListener* active_listener;
+static IoListener* _active_listener;
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
-  std::cout << "data_callback()" << std::endl;
-  // active_listener->audio_callback((float*)pInput, (float*)pOutput, frameCount);
+  _active_listener->audio_callback((float*)pInput, (float*)pOutput, frameCount);
 }
 
 class Connection {
@@ -40,9 +43,10 @@ public:
     std::cout << "Connection()" << std::endl;
   }
   ~Connection() { 
+    ma_device_uninit(&_data->device);
     std::cout << "~Connection()" << std::endl; 
   }
-  
+
   static std::unique_ptr<Connection> New(DeviceInfo info) {
     auto data = std::make_unique<Data>(info);
 
@@ -62,7 +66,7 @@ public:
   }
 
   DeviceInfo info() {
-    _data->info;
+    return _data->info;
   }
   
 private:

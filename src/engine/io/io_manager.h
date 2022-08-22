@@ -17,8 +17,9 @@ private:
   };
 public:
   IoManager(std::unique_ptr<Data> data): _data(std::move(data)) {};
-  
-  static std::unique_ptr<IoManager> New() {
+
+  static std::unique_ptr<IoManager> New(IoListener& listener) {
+    _active_listener = &listener;
     auto data = std::make_unique<Data>();
     if (ma_context_init(NULL, 0, NULL, &data->context) != MA_SUCCESS) {
       std::cout << "ma_context_init() failed" << std::endl;

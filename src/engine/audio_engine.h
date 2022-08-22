@@ -17,9 +17,9 @@ struct SessionState {
   float beats;
 };
 
-class AudioEngine {
+class AudioEngine: public IoListener {
   public: 
-    AudioEngine(): _ioManager(IoManager::New()) {}
+    AudioEngine(): _ioManager(IoManager::New(*this)) {}
 
     SessionState getSessionState() {
       return SessionState {
@@ -42,6 +42,11 @@ class AudioEngine {
       if (state.available.size() > 0 && !state.connected) {
         if (_ioManager) _ioManager->connect_input(state.available[0]);  
       }
+    }
+
+    // AUDIO THREAD. Realtime-safe code only
+    void audio_callback(float* input, float* output, uint32_t frame_count) override {
+      std::cout << "audio_callback()" << std::endl;
     }
   
   private:

@@ -30,7 +30,7 @@ Napi::Value NodeAudio::getConnectionState(const Napi::CallbackInfo& info) {
     auto len = state.available.size();
     Napi::Object obj = Napi::Object::New(env);
     Napi::Array available = Napi::Array::New(env, len);
-    for (auto i=0 ; i<len; i++) {
+    for (size_t i=0 ; i<len; i++) {
         available[i] = Napi::String::New(env, state.available[i].name.c_str());
     }
     obj.Set("available", available);
