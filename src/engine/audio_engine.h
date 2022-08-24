@@ -36,13 +36,19 @@ class AudioEngine: public IoListener {
 
     void connect(std::string audioPortId) {
       auto state = getConnectionState();
-      if (state.available.size() > 0 && !state.connected) {
-        if (_ioManager) _ioManager->connect_input(state.available[0]);  
+      if (state.available.size() > 1 && !state.connected) {
+        if (_ioManager) _ioManager->connect_input(state.available[1]);  
       }
     }
 
     // AUDIO THREAD. Realtime-safe code only
     void audio_callback(float* input, float* output, uint32_t frame_count) override {
+      // std::cout << "frames: " << frame_count << " | ";
+      // for (auto i=0 ; i<5 ; i++) {
+      //   float val = input[i];
+      //   std::cout << val << ", ";
+      // }
+      // std::cout << std::endl;
       _dspManager->update(input, frame_count);
     }
   

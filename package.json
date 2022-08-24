@@ -7,7 +7,7 @@
     "install": "make ./lib/aubio && node-gyp rebuild",
     "pretest": "tsc",
     "test": "node --napi-modules ./test/test_binding.js",
-    "start": "npm run test"
+    "start": "npm i && npm run test"
   },
   "gypfile": true,
   "name": "node-audio",

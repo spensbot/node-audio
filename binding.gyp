@@ -17,8 +17,8 @@
           '../lib/aubio/build/src/libaubio.a',
         ],
       'dependencies': ["<!(node -p \"require('node-addon-api').gyp\")"],
-      'cflags!': [ '-fno-exceptions', '-std=c++17' ],
-      'cflags_cc!': [ '-fno-exceptions', '-std=c++17' ],
+      'cflags!': [ '-fno-exceptions', '-std=c++17', '-Werror=return-type' ],
+      'cflags_cc!': [ '-fno-exceptions', '-std=c++17', '-Werror=return-type' ],
       'xcode_settings': {
         'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
         'CLANG_CXX_LIBRARY': 'libc++',
