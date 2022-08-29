@@ -14,9 +14,6 @@ public:
   virtual void audio_callback(float* input, float* output, uint32_t frame_count) = 0;
 };
 
-// I don't like this, but I'm not sure how else to have data_callback reference something
-static IoListener* _active_listener;
-
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
   IoListener* ioListener = reinterpret_cast<IoListener*>(pDevice->pUserData);
@@ -41,6 +38,7 @@ private:
       config.capture.format = ma_format_f32;
       config.capture.shareMode = ma_share_mode_shared;
       config.dataCallback = data_callback;
+      config.capture.pDeviceID = &deviceInfo.ma_id;
       config.pUserData = &ioListener; // Store listener ptr in pUserPtrs
     }
     DeviceInfo deviceInfo;
@@ -54,10 +52,8 @@ public:
     ma_device_uninit(&_ptrs->device);
   }
 
-  static std::unique_ptr<Connection> New(DeviceInfo info, IoListener& ioListener) {
-    auto ptrs = std::make_unique<Ptrs>(info, ioListener);
-
-    std::cout << "Sample Rate: " << ptrs->device.sampleRate << std::endl;
+  static std::unique_ptr<Connection> New(DeviceInfo deviceInfo, IoListener& ioListener) {
+    auto ptrs = std::make_unique<Ptrs>(deviceInfo, ioListener);
 
     if (ma_device_init(NULL, &ptrs->config, &ptrs->device) == MA_SUCCESS) {
       if (ma_device_start(&ptrs->device) == MA_SUCCESS) {
@@ -77,6 +73,5 @@ public:
   }
   
 private:
-
   std::unique_ptr<Ptrs> _ptrs;
 };

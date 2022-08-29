@@ -3,45 +3,70 @@
 
 using namespace Napi;
 
+namespace {
+    void assert_num_args(const Napi::CallbackInfo& info, const Napi::Env& env, size_t num) {
+        if (info.Length() < num) {
+            Napi::TypeError::New(env, "Wrong number of arguments")
+                .ThrowAsJavaScriptException();
+        }
+    }
+
+    Napi::Value to_js(const Napi::Env& env, const std::string& string) {
+        return Napi::String::New(env, string.c_str());
+    }
+    std::string string_from_js(const Napi::Env& env, const Napi::Value& val) {
+        if (!val.IsString()) {
+            Napi::TypeError::New(env, "Argument must be a string")
+                .ThrowAsJavaScriptException();
+        }
+        Napi::String string = val.As<Napi::String>();
+        return string.Utf8Value();
+    }
+
+    Napi::Value to_js(const Napi::Env& env, const DeviceInfo& deviceInfo) {
+        auto obj = Napi::Object::New(env);
+        obj.Set("is_default", deviceInfo.is_default);
+        obj.Set("name", to_js(env, deviceInfo.name));
+        obj.Set("id", to_js(env, deviceInfo.id));
+        return obj;
+    }
+
+    Napi::Value to_js(const Napi::Env& env, const ConnectionState& state) {
+        auto len = state.available.size();
+        Napi::Object obj = Napi::Object::New(env);
+        Napi::Array available = Napi::Array::New(env, len);
+        for (size_t i=0 ; i<len; i++) {
+            available[i] = to_js(env, state.available[i]);
+        }
+        obj.Set("available", available);
+
+        if (state.connected) {
+            obj.Set("connected", to_js(env, *state.connected));
+        } else {
+            obj.Set("connected", env.Null());
+        }
+        return obj;
+    }
+} // namespace 
+
 NodeAudio::NodeAudio(const Napi::CallbackInfo& info) : ObjectWrap(info) {
 }
 
 void NodeAudio::connect(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
 
-    if (info.Length() < 1) {
-        Napi::TypeError::New(env, "Wrong number of arguments")
-          .ThrowAsJavaScriptException();
+    assert_num_args(info, env, 1);
+
+    if (info[0].IsNull()) {
+        _engine.connect(std::nullopt);
+    } else {
+        _engine.connect(string_from_js(env, info[0]));
     }
-
-    if (!info[0].IsString()) {
-        Napi::TypeError::New(env, "First argument must be a string")
-          .ThrowAsJavaScriptException();
-    }
-
-    Napi::String audio_port_id = info[0].As<Napi::String>();
-
-    _engine.connect(audio_port_id.Utf8Value());
 }
 
 Napi::Value NodeAudio::getConnectionState(const Napi::CallbackInfo& info) {
     auto env = info.Env();
-    auto state = _engine.getConnectionState();
-    auto len = state.available.size();
-    Napi::Object obj = Napi::Object::New(env);
-    Napi::Array available = Napi::Array::New(env, len);
-    for (size_t i=0 ; i<len; i++) {
-        available[i] = Napi::String::New(env, state.available[i].name.c_str());
-    }
-    obj.Set("available", available);
-
-    if (state.connected) {
-        obj.Set("connected", Napi::String::New(env, state.connected->name.c_str()));
-    } else {
-        obj.Set("connected", env.Null());
-    }
-
-    return obj;
+    return to_js(env, _engine.getConnectionState());
 }
 
 Napi::Value NodeAudio::getSessionState(const Napi::CallbackInfo& info) {

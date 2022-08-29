@@ -58,8 +58,21 @@ public:
     }
   }
 
-  void connect_input(DeviceInfo info) {
-    _input_connection = Connection::New(info, _ioListener);
+  void connect_input(std::optional<std::string> device_id) {
+    if (device_id) {
+      for (const auto& input: list_inputs()) {
+        if (input.id == device_id) {
+          _input_connection = Connection::New(input, _ioListener);
+          return;
+        }
+      }
+    } else {
+      for (const auto& input: list_inputs()) {
+        if (input.is_default) {
+          _input_connection = Connection::New(input, _ioListener);
+        }
+      }
+    }
   }
 
 private:

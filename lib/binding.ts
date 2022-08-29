@@ -19,7 +19,7 @@ interface SessionState {
 }
 
 interface INodeAudioNative {
-  connect(audioPortId: string): void
+  connect(audioPortId: string | null): void
   getConnectionState(): ConnectionState
   getSessionState(): SessionState
 }
@@ -29,7 +29,7 @@ class NodeAudio {
     this._addonInstance = new addon.NodeAudio()
   }
 
-  connect(audioPortId: string) {
+  connect(audioPortId: string | null) {
     return this._addonInstance.connect(audioPortId)
   }
 
