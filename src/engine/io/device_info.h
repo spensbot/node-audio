@@ -5,14 +5,19 @@
 
 struct DeviceInfo {
   DeviceInfo(ma_device_info& info) {
-    is_default = info.isDefault;
+    isDefault = info.isDefault;
     id = std::string(info.name);
     name = std::string(info.name);
-    og_id = info.id;
   }
 
   std::string id;
-  bool is_default;
+  bool isDefault;
   std::string name;
-  ma_device_id og_id;
+
+private:
+  std::string ma_id_to_string(ma_device_id ma_id) {
+    const char* data = reinterpret_cast<const char*>(&ma_id);
+    const size_t bytes = sizeof(ma_id);
+    return std::string(data, bytes);
+  }
 };

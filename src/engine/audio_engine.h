@@ -1,7 +1,7 @@
 #pragma once
 
+#include "io/connection_state.h"
 #include "io/io_manager.h"
-#include "session_state.h"
 #include "dsp/dsp_manager.h"
 
 #include <string>
@@ -9,19 +9,14 @@
 #include <optional>
 #include <iostream>
 
-struct ConnectionState {
-  std::vector<DeviceInfo> available;
-  std::optional<DeviceInfo> connected;
-};
-
 class AudioEngine: public IoListener {
   public: 
     AudioEngine()
-    : _ioManager(IoManager::New(*this))
+    : _ioManager(IoManager::New(*this)) // <-- This may fail, in which case _ioManager will be null
     , _dspManager(std::make_unique<DspManager>()) 
     {}
 
-    SessionState getSessionState() {
+    DspManager::SessionState getSessionState() {
       return _dspManager->sessionState();
     }
 
@@ -43,13 +38,7 @@ class AudioEngine: public IoListener {
 
     // AUDIO THREAD. Realtime-safe code only
     void audio_callback(float* input, float* output, uint32_t frame_count) override {
-      // std::cout << "frames: " << frame_count << " | ";
-      // for (auto i=0 ; i<5 ; i++) {
-      //   float val = input[i];
-      //   std::cout << val << ", ";
-      // }
-      // std::cout << std::endl;
-      _dspManager->update(input, frame_count);
+      // _dspManager->update(input, frame_count);
     }
   
   private:

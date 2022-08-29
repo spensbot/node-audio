@@ -13,6 +13,9 @@ interface ConnectionState {
 interface SessionState {
   bpm: number
   beats: number
+  rms: number
+  confidence: number
+  confidence_threshold: number
 }
 
 interface INodeAudioNative {

@@ -4,7 +4,9 @@ const assert = require("assert")
 assert(NodeAudio, "The expected module is undefined")
 
 const nodeAudio = new NodeAudio()
+console.log("new NodeAudio()")
 nodeAudio.connect("Nothing")
+console.log(`nodeAudio.connect("Nothing")`)
 
 function testBasic() {
   let connectionState = nodeAudio.getConnectionState()

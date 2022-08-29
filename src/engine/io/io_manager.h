@@ -12,20 +12,22 @@
 
 class IoManager {
 private:
-  struct Data {
+  struct Ptrs {
     ma_context context;
   };
 public:
-  IoManager(std::unique_ptr<Data> data): _data(std::move(data)) {};
+  IoManager(IoListener& ioListener, std::unique_ptr<Ptrs> ptrs)
+  : _ioListener(ioListener)
+  , _ptrs(std::move(ptrs)) 
+  {}
 
-  static std::unique_ptr<IoManager> New(IoListener& listener) {
-    _active_listener = &listener;
-    auto data = std::make_unique<Data>();
-    if (ma_context_init(NULL, 0, NULL, &data->context) != MA_SUCCESS) {
+  static std::unique_ptr<IoManager> New(IoListener& ioListener) {
+    auto ptrs = std::make_unique<Ptrs>();
+    if (ma_context_init(NULL, 0, NULL, &ptrs->context) != MA_SUCCESS) {
       std::cout << "ma_context_init() failed" << std::endl;
       return nullptr;
     }
-    return std::make_unique<IoManager>(std::move(data));
+    return std::make_unique<IoManager>(ioListener, std::move(ptrs));
   }
 
   std::vector<DeviceInfo> list_inputs() {
@@ -34,7 +36,7 @@ public:
     ma_device_info* pCaptureDeviceInfos;
     ma_uint32 captureDeviceCount;
 
-    auto res = ma_context_get_devices(&_data->context, &pPlaybackDeviceInfos, &playbackDeviceCount, &pCaptureDeviceInfos, &captureDeviceCount);
+    auto res = ma_context_get_devices(&_ptrs->context, &pPlaybackDeviceInfos, &playbackDeviceCount, &pCaptureDeviceInfos, &captureDeviceCount);
     if (res != MA_SUCCESS) {
       std::cout << "ma_context_get_devices() failed" << std::endl;
       return {};
@@ -50,17 +52,18 @@ public:
 
   std::optional<DeviceInfo> connected() {
     if (_input_connection) {
-      return _input_connection->info();
+      return _input_connection->info().deviceInfo;
     } else {
       return std::nullopt;
     }
   }
 
   void connect_input(DeviceInfo info) {
-    _input_connection = Connection::New(info);
+    _input_connection = Connection::New(info, _ioListener);
   }
 
 private:
-  std::unique_ptr<Data> _data;
+  IoListener& _ioListener;
+  std::unique_ptr<Ptrs> _ptrs;
   std::unique_ptr<Connection> _input_connection;
 };

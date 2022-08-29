@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Launch Program",
+      "program": "/usr/local/bin/node",
+      "args": [
+        "/Users/spensersaling/Documents/repos/node-audio/test/test_binding.js"
+      ]
+    }
+  ]
+}
