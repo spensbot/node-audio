@@ -1,6 +1,3 @@
 [submodule "src/aubio"]
 	path = lib/aubio
 	url = git@github.com:aubio/aubio.git
-[submodule "src/portaudio"]
-	path = lib/portaudio
-	url = git@github.com:PortAudio/portaudio.git
