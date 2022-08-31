@@ -30,7 +30,13 @@ class AudioEngine: public IoListener {
     }
 
     void connect(std::optional<std::string> device_id) {
-      if (_ioManager) _ioManager->connect_input(device_id);  
+      if (_ioManager) {
+        const auto connection_info = _ioManager->connect_input(device_id);
+        if (connection_info) {
+          _dspManager->reset(connection_info->sampleRate);
+          _ioManager->start_input();
+        }
+      }
     }
 
     // AUDIO THREAD. Realtime-safe code only

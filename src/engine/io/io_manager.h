@@ -58,19 +58,29 @@ public:
     }
   }
 
-  void connect_input(std::optional<std::string> device_id) {
+  std::optional<ConnectionInfo> connect_input(std::optional<std::string> device_id) {
     if (device_id) {
       for (const auto& input: list_inputs()) {
         if (input.id == device_id) {
           _input_connection = Connection::New(input, _ioListener);
-          return;
+          if (_input_connection) return _input_connection->info();
         }
       }
     } else {
       for (const auto& input: list_inputs()) {
         if (input.is_default) {
           _input_connection = Connection::New(input, _ioListener);
+          if (_input_connection) return _input_connection->info();
         }
+      }
+    }
+    return std::nullopt;
+  }
+
+  void start_input() {
+    if (_input_connection) {
+      if (!_input_connection->start()) {
+        std::cout << "io_manager.start_input() failed" << std::endl;
       }
     }
   }

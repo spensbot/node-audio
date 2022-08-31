@@ -9,10 +9,7 @@
         "src/engine",
         "lib",
         "lib/aubio/src",
-        "lib/portaudio/include"
       ],
-      # 'libraries': ['<!@(pkg-config jack2 --cflags --libs)'],
-      # 'libraries': ['-ljack'],
       'libraries': [
           '../lib/aubio/build/src/libaubio.a',
         ],

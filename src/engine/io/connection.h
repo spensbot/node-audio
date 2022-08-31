@@ -38,7 +38,7 @@ private:
       config.capture.format = ma_format_f32;
       config.capture.shareMode = ma_share_mode_shared;
       config.dataCallback = data_callback;
-      config.capture.pDeviceID = &deviceInfo.ma_id;
+      // config.capture.pDeviceID = &deviceInfo.ma_id;
       config.pUserData = &ioListener; // Store listener ptr in pUserPtrs
     }
     DeviceInfo deviceInfo;
@@ -56,16 +56,16 @@ public:
     auto ptrs = std::make_unique<Ptrs>(deviceInfo, ioListener);
 
     if (ma_device_init(NULL, &ptrs->config, &ptrs->device) == MA_SUCCESS) {
-      if (ma_device_start(&ptrs->device) == MA_SUCCESS) {
-        return std::make_unique<Connection>(std::move(ptrs));
-      } else {
-        std::cout << "ma_device_start() failed" << std::endl;
-      }
+      return std::make_unique<Connection>(std::move(ptrs));
     } else {
       std::cout << "ma_device_init() failed" << std::endl;
     }
     
     return nullptr;
+  }
+
+  bool start() {
+    return ma_device_start(&_ptrs->device) == MA_SUCCESS;
   }
 
   ConnectionInfo info() {
