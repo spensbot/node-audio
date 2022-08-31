@@ -31,7 +31,7 @@ public:
 
   void reset(uint32_t sample_rate) {
     _ptrs = std::make_unique<Ptrs>(sample_rate);
-    _rms.setSustainSeconds(sample_rate, 0.1, 0.5);
+    _rms.setSustainSeconds(sample_rate, 0.05, 0.2);
     _sample_rate = sample_rate;
   }
 

@@ -48,7 +48,7 @@ private:
   }
 
   static float intra_beat(float beats) {
-    return beats - fmod(beats, 1.0);
+    return fmod(beats, 1.0);
   }
 
   void correct_beats(float target_intra_beat, float dt_beats) {
