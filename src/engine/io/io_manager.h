@@ -61,15 +61,15 @@ public:
   std::optional<ConnectionInfo> connect_input(std::optional<std::string> device_id) {
     if (device_id) {
       for (const auto& input: list_inputs()) {
-        if (input.id == device_id) {
-          _input_connection = Connection::New(input, _ioListener);
+        if (input.id == *device_id) {
+          _input_connection = Connection::New(_ptrs->context, input, _ioListener);
           if (_input_connection) return _input_connection->info();
         }
       }
     } else {
       for (const auto& input: list_inputs()) {
         if (input.is_default) {
-          _input_connection = Connection::New(input, _ioListener);
+          _input_connection = Connection::New(_ptrs->context, input, _ioListener);
           if (_input_connection) return _input_connection->info();
         }
       }

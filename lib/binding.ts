@@ -1,16 +1,16 @@
 const addon = require('../build/Release/node-audio-native')
 
-interface AudioPort {
+export interface AudioPort {
   id: string
   name: string
 }
 
-interface ConnectionState {
-  available: [AudioPort]
+export interface AudioConnectionState {
+  available: AudioPort[]
   connected: AudioPort | null
 }
 
-interface SessionState {
+export interface SessionState {
   bpm: number
   beats: number
   rms: number
@@ -20,7 +20,7 @@ interface SessionState {
 
 interface INodeAudioNative {
   connect(audioPortId: string | null): void
-  getConnectionState(): ConnectionState
+  getConnectionState(): AudioConnectionState
   getSessionState(): SessionState
 }
 
@@ -45,4 +45,4 @@ class NodeAudio {
   private _addonInstance: INodeAudioNative
 }
 
-export = NodeAudio
+export default NodeAudio
