@@ -1,6 +1,7 @@
 #pragma once 
 
 #include "io/device_info.h"
+#include "ConnectionConfig.h"
 
 #include <iostream>
 #include <optional>
@@ -11,22 +12,23 @@ public:
   //    NO MEMORY MANAGEMENT
   //    NO LOCKS
   //    NO IO
-  virtual void audio_callback(float* input, float* output, uint32_t frame_count) = 0;
+  // Note: channels are interleaved in each frame
+  virtual void audio_callback(float* input, float* output, uint32_t frame_count, uint32_t channel_count) = 0;
 };
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
   IoListener* ioListener = reinterpret_cast<IoListener*>(pDevice->pUserData);
-  ioListener->audio_callback((float*)pInput, (float*)pOutput, frameCount);
+  const uint32_t channel_count = pDevice->capture.channels;
+  ioListener->audio_callback((float*)pInput, (float*)pOutput, frameCount, channel_count);
 }
 
 struct ConnectionInfo {
   ConnectionInfo(ma_device& device, DeviceInfo& deviceInfo)
-  : channelCount(device.capture.channels)
-  , sampleRate(device.sampleRate)
-  , deviceInfo(deviceInfo) {}
-
-  uint32_t channelCount, sampleRate;
+  : config(ConnectionConfig(device))
+  , deviceInfo(deviceInfo) 
+  {}
+  ConnectionConfig config;
   DeviceInfo deviceInfo;
 };
 

@@ -33,15 +33,15 @@ class AudioEngine: public IoListener {
       if (_ioManager) {
         const auto connection_info = _ioManager->connect_input(device_id);
         if (connection_info) {
-          _dspManager->reset(connection_info->sampleRate);
+          _dspManager->reset(connection_info->config);
           _ioManager->start_input();
         }
       }
     }
 
     // AUDIO THREAD. Realtime-safe code only
-    void audio_callback(float* input, float* output, uint32_t frame_count) override {
-      _dspManager->update(input, frame_count);
+    void audio_callback(float* input, float* output, uint32_t frame_count, uint32_t channel_count) override {
+      _dspManager->update(input);
     }
   
   private:
