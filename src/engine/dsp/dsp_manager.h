@@ -41,19 +41,19 @@ public:
   // AUDIO THREAD! Realtime safe only
   void update(float* frames) {
     _fftBuffer.write(frames);
-    // while(auto hop = _fftBuffer.read()) {
-    //   aubio_tempo_do(_ptrs->tempo, &*hop, _ptrs->beats_out);
-    // }
+    while(auto hop = _fftBuffer.read()) {
+      aubio_tempo_do(_ptrs->tempo, &*hop, _ptrs->beats_out);
+    }
     
-    // auto bpm = aubio_tempo_get_bpm(_ptrs->tempo);
-    // auto seconds_since_last_beat = aubio_tempo_get_last_s(_ptrs->tempo);
-    // auto confidence = aubio_tempo_get_confidence(_ptrs->tempo);
-    // auto dt_s = calc_seconds(_config.frameCount, _config.sampleRate);
-    // _beatTracker.update(bpm, seconds_since_last_beat, confidence, dt_s);
+    auto bpm = aubio_tempo_get_bpm(_ptrs->tempo);
+    auto seconds_since_last_beat = aubio_tempo_get_last_s(_ptrs->tempo);
+    auto confidence = aubio_tempo_get_confidence(_ptrs->tempo);
+    auto dt_s = calc_seconds(_config.frameCount, _config.sampleRate);
+    _beatTracker.update(bpm, seconds_since_last_beat, confidence, dt_s);
 
-    // _outBpm.store(_beatTracker.bpm());
-    // _outBeats.store(_beatTracker.beats());
-    // _outConfidence.store(confidence);
+    _outBpm.store(_beatTracker.bpm());
+    _outBeats.store(_beatTracker.beats());
+    _outConfidence.store(confidence);
 
     for (const auto sample : _fftBuffer.reader().readAvg()) {
       _rms.push(sample);
