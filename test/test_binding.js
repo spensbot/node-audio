@@ -1,4 +1,4 @@
-const NodeAudio = require("../dist/binding.js")
+const NodeAudio = require("../lib/binding.js")
 const assert = require("assert")
 
 assert(NodeAudio, "The expected module is undefined")
@@ -6,7 +6,7 @@ assert(NodeAudio, "The expected module is undefined")
 const nodeAudio = new NodeAudio()
 console.log("new NodeAudio()")
 nodeAudio.connect(null)
-console.log(`nodeAudio.connect("Nothing")`)
+console.log(`nodeAudio.connect(null)`)
 
 function testBasic() {
   let connectionState = nodeAudio.getConnectionState()

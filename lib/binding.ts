@@ -1,4 +1,4 @@
-const addon = require('../build/Release/node-audio-native')
+const addon = require("../build/Release/node-audio-native")
 
 export interface AudioPort {
   id: string
@@ -14,8 +14,15 @@ export interface SessionState {
   bpm: number
   beats: number
   rms: number
-  confidence: number
-  confidenceThreshold: number
+  lrBalance: number
+  rms_l: number
+  rms_r: number
+  phaseVocoder: number[]
+  pitch: number
+  pitchConfidence: number
+  bpmConfidence: number
+  bpmConfidenceThreshold: number
+  bpmUnconfident: number
 }
 
 interface INodeAudioNative {

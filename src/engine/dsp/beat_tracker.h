@@ -4,14 +4,16 @@
 
 // TODO: Evaluate the idea of turning _last_confident_bpm into a rolling_avg that moves more quickly 
 
+// Takes bpm values & confidence from aubio and turns them into a consistent beat-time
 class BeatTracker {
-  constexpr static float MAX_CORRECTION_PER_BEAT = 0.5;
-
 public:
-  BeatTracker(float initBpm, float confidenceThreshold)
-  : _last_confident_bpm(initBpm)
+  constexpr static float MAX_CORRECTION_PER_BEAT = 0.5;
+  constexpr static float INIT_BPM = 120.0;
+  constexpr static float CONFIDENCE_THRESHOLD = 0.11;
+  BeatTracker()
+  : _last_confident_bpm(INIT_BPM)
   , _beats(0.0)
-  , _confidence_threshold(0.5) 
+  , _confidence_threshold(CONFIDENCE_THRESHOLD) 
   {}
 
   void update(float detected_bpm, float detected_s_since_last_beat, float confidence, float dt_s) {

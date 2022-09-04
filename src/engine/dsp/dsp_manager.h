@@ -12,8 +12,6 @@
 
 
 class DspManager {
-  constexpr static float DEFAULT_BPM = 120.0;
-  constexpr static float CONFIDENCE_THRESHOLD = 0.00;
   struct Ptrs {
     Ptrs(ConnectionConfig config): beats_out(new_fvec(1)) {
       tempo = new_aubio_tempo("default", 1024, 256, config.sampleRate);
@@ -26,7 +24,7 @@ class DspManager {
     fvec_t* beats_out;
   };
 public:
-  DspManager(): _beatTracker(DEFAULT_BPM, CONFIDENCE_THRESHOLD) {}
+  DspManager() {}
   ~DspManager() {
     aubio_cleanup();
   }
@@ -51,9 +49,10 @@ public:
     auto dt_s = calc_seconds(_config.frameCount, _config.sampleRate);
     _beatTracker.update(bpm, seconds_since_last_beat, confidence, dt_s);
 
-    _outBpm.store(_beatTracker.bpm());
+    _outBpm.store(_beatTracker.bpm());   
     _outBeats.store(_beatTracker.beats());
     _outConfidence.store(confidence);
+    _outUnconfidentBpm.store(bpm);
 
     for (const auto sample : _fftBuffer.reader().readAvg()) {
       _rms.push(sample);
@@ -67,7 +66,8 @@ public:
     float beats;
     float rms;
     float confidence;
-    float confidence_threshold;
+    float confidenceThreshold;
+    float bpmUnconfident;
   };
 
   SessionState sessionState() {
@@ -76,7 +76,8 @@ public:
       _outBeats.load(),
       _outRms.load(),
       _outConfidence.load(),
-      CONFIDENCE_THRESHOLD,
+      BeatTracker::CONFIDENCE_THRESHOLD,
+      _outUnconfidentBpm.load()
     };
   }
 
@@ -91,6 +92,7 @@ private:
   std::atomic<float> _outBeats;
   std::atomic<float> _outRms;
   std::atomic<float> _outConfidence;
+  std::atomic<float> _outUnconfidentBpm;
 
   static float calc_seconds(uint32_t samples, uint32_t sampleRate) {
     return static_cast<float>(samples) / static_cast<float>(sampleRate);

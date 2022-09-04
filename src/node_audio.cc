@@ -78,7 +78,7 @@ Napi::Value NodeAudio::getSessionState(const Napi::CallbackInfo& info) {
     obj.Set("beats", sessionState.beats);
     obj.Set("rms", sessionState.rms);
     obj.Set("confidence", sessionState.confidence);
-    obj.Set("confidence_threshold", sessionState.confidence_threshold);
+    obj.Set("confidenceThreshold", sessionState.confidenceThreshold);
 
     return obj;
 }
