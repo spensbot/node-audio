@@ -41,7 +41,7 @@ public:
 
 private:
   float _last_confident_bpm;
-  float _beats;
+  double _beats;
   float _confidence_threshold;
 
   static float s_to_beats(float seconds, float bpm) {
@@ -49,7 +49,7 @@ private:
     return bpm * minutes;
   }
 
-  static float intra_beat(float beats) {
+  static float intra_beat(double beats) {
     return fmod(beats, 1.0);
   }
 

@@ -14,14 +14,33 @@
 class DspManager {
   struct Ptrs {
     Ptrs(ConnectionConfig config): beats_out(new_fvec(1)) {
-      tempo = new_aubio_tempo("default", 1024, 256, config.sampleRate);
+      tempo = new_aubio_tempo("default", FftBuffer::WINDOW_SIZE, FftBuffer::HOP_SIZE, config.sampleRate);
+      beats_out = new_fvec(1);
+      phaseVocoder = new_aubio_pvoc(FftBuffer::WINDOW_SIZE, FftBuffer::HOP_SIZE);
+      phaseVocoder_out = new_cvec(FftBuffer::HOP_SIZE);
+      fft = new_aubio_fft(FftBuffer::WINDOW_SIZE);
+      fft_out = new_cvec(FftBuffer::WINDOW_SIZE);
+      pitch = new_aubio_pitch("default", FftBuffer::WINDOW_SIZE, FftBuffer::HOP_SIZE, config.sampleRate);
+      pitch_out = new_fvec(1);
     }
     ~Ptrs() {
-      del_fvec(beats_out);
       del_aubio_tempo(tempo);
+      del_fvec(beats_out);
+      del_aubio_pvoc(phaseVocoder);
+      del_cvec(phaseVocoder_out);
+      del_aubio_fft(fft);
+      del_cvec(fft_out);
+      del_aubio_pitch(pitch);
+      del_fvec(pitch_out);
     }
     aubio_tempo_t* tempo;
     fvec_t* beats_out;
+    aubio_pvoc_t* phaseVocoder;
+    cvec_t* phaseVocoder_out;
+    aubio_fft_t* fft;
+    cvec_t* fft_out;
+    aubio_pitch_t* pitch;
+    fvec_t* pitch_out;
   };
 public:
   DspManager() {}
@@ -41,18 +60,23 @@ public:
     _fftBuffer.write(frames);
     while(auto hop = _fftBuffer.read()) {
       aubio_tempo_do(_ptrs->tempo, &*hop, _ptrs->beats_out);
+      aubio_pvoc_do(_ptrs->phaseVocoder, &*hop, _ptrs->phaseVocoder_out);
+      aubio_fft_do(_ptrs->fft, &*hop, _ptrs->fft_out);
+      aubio_pitch_do(_ptrs->pitch, &*hop, _ptrs->pitch_out);
     }
     
     auto bpm = aubio_tempo_get_bpm(_ptrs->tempo);
-    auto seconds_since_last_beat = aubio_tempo_get_last_s(_ptrs->tempo);
-    auto confidence = aubio_tempo_get_confidence(_ptrs->tempo);
+    auto secondsSinceLastBeat = aubio_tempo_get_last_s(_ptrs->tempo);
+    auto bpmConfidence = aubio_tempo_get_confidence(_ptrs->tempo);
     auto dt_s = calc_seconds(_config.frameCount, _config.sampleRate);
-    _beatTracker.update(bpm, seconds_since_last_beat, confidence, dt_s);
+    _beatTracker.update(bpm, secondsSinceLastBeat, bpmConfidence, dt_s);
 
     _outBpm.store(_beatTracker.bpm());   
     _outBeats.store(_beatTracker.beats());
-    _outConfidence.store(confidence);
-    _outUnconfidentBpm.store(bpm);
+    _outBpmConfidence.store(bpmConfidence);
+    _outBpmUnconfident.store(bpm);
+    _outPitch.store(_ptrs->pitch_out->data[0]);
+    _outPitchConfidence.store(aubio_pitch_get_confidence(_ptrs->pitch));
 
     for (const auto sample : _fftBuffer.reader().readAvg()) {
       _rms.push(sample);
@@ -63,11 +87,17 @@ public:
   
   struct SessionState {
     float bpm;
-    float beats;
+    double beats;
     float rms;
-    float confidence;
-    float confidenceThreshold;
+    float lrBalance;
+    float rms_l;
+    float rms_r;
+    float pitch;
+    float pitchConfidence;
+    float bpmConfidence;
+    float bpmConfidenceThreshold;
     float bpmUnconfident;
+    std::vector<float> phaseVocoder;
   };
 
   SessionState sessionState() {
@@ -75,9 +105,15 @@ public:
       _outBpm.load(),
       _outBeats.load(),
       _outRms.load(),
-      _outConfidence.load(),
+      _outLrBalance.load(),
+      _outRms_l.load(),
+      _outRms_r.load(),
+      _outPitch.load(),
+      _outPitchConfidence.load(),
+      _outBpmConfidence.load(),
       BeatTracker::CONFIDENCE_THRESHOLD,
-      _outUnconfidentBpm.load()
+      _outBpmUnconfident.load(),
+      std::vector<float> {}
     };
   }
 
@@ -91,8 +127,14 @@ private:
   std::atomic<float> _outBpm;
   std::atomic<float> _outBeats;
   std::atomic<float> _outRms;
-  std::atomic<float> _outConfidence;
-  std::atomic<float> _outUnconfidentBpm;
+  std::atomic<float> _outLrBalance;
+  std::atomic<float> _outRms_l;
+  std::atomic<float> _outRms_r;
+  std::atomic<float> _outPitch;
+  std::atomic<float> _outPitchConfidence;
+  std::atomic<float> _outBpmConfidence;
+  std::atomic<float> _outBpmUnconfident;
+  std::vector<std::atomic<float>> _outPhaseVocoder;
 
   static float calc_seconds(uint32_t samples, uint32_t sampleRate) {
     return static_cast<float>(samples) / static_cast<float>(sampleRate);

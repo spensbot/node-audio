@@ -47,6 +47,14 @@ namespace {
         }
         return obj;
     }
+
+    Napi::Value to_js(const Napi::Env& env, std::vector<float> floatVector) {
+        Napi::Array out = Napi::Array::New(env, floatVector.size());
+        for (auto i=0 ; i<floatVector.size() ; i++) {
+            out[i] = floatVector[i];
+        }
+        return out;
+    }
 } // namespace 
 
 NodeAudio::NodeAudio(const Napi::CallbackInfo& info) : ObjectWrap(info) {
@@ -77,8 +85,15 @@ Napi::Value NodeAudio::getSessionState(const Napi::CallbackInfo& info) {
     obj.Set("bpm", sessionState.bpm);
     obj.Set("beats", sessionState.beats);
     obj.Set("rms", sessionState.rms);
-    obj.Set("confidence", sessionState.confidence);
-    obj.Set("confidenceThreshold", sessionState.confidenceThreshold);
+    obj.Set("lrBalance", sessionState.lrBalance);
+    obj.Set("rms_l", sessionState.rms_l);
+    obj.Set("rms_r", sessionState.rms_r);
+    obj.Set("phaseVocoder", to_js(env, sessionState.phaseVocoder));
+    obj.Set("pitch", sessionState.pitch);
+    obj.Set("pitchConfidence", sessionState.pitchConfidence);
+    obj.Set("bpmConfidence", sessionState.bpmConfidence);
+    obj.Set("bpmConfidenceThreshold", sessionState.bpmConfidenceThreshold);
+    obj.Set("bpmUnconfident", sessionState.bpmUnconfident);
 
     return obj;
 }

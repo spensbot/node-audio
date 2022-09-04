@@ -14,15 +14,15 @@ export interface SessionState {
   bpm: number
   beats: number
   rms: number
-  lrBalance: number
   rms_l: number
   rms_r: number
-  phaseVocoder: number[]
+  lrBalance: number
   pitch: number
   pitchConfidence: number
   bpmConfidence: number
   bpmConfidenceThreshold: number
   bpmUnconfident: number
+  phaseVocoder: number[]
 }
 
 interface INodeAudioNative {

@@ -79,7 +79,7 @@ private:
 // This allows a full hop of samples to be sent to the fft algorithm even between frames
 class FftBuffer {
 public:
-  static constexpr uint32_t BUFFER_SIZE = 1024;
+  static constexpr uint32_t WINDOW_SIZE = 1024;
   static constexpr uint32_t HOP_SIZE = 256;
 
   FftBuffer() = default;
