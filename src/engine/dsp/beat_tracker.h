@@ -2,6 +2,10 @@
 
 #include <math.h>
 
+inline float calc_seconds(uint32_t samples, uint32_t sampleRate) {
+  return static_cast<float>(samples) / static_cast<float>(sampleRate);
+}
+
 // TODO: Evaluate the idea of turning _last_confident_bpm into a rolling_avg that moves more quickly 
 
 // Takes bpm values & confidence from aubio and turns them into a consistent beat-time
@@ -54,15 +58,15 @@ private:
   }
 
   void correct_beats(float target_intra_beat, float dt_beats) {
-    // const float current_intra_beat = intra_beat(_beats);
-    // float dif = target_intra_beat - current_intra_beat;
-    // const float max_correction = MAX_CORRECTION_PER_BEAT * dt_beats;
-    // if (dif > 0.5) {
-    //   dif -= 1.0;
-    // } else if (dif < -0.5) {
-    //   dif += 1.0;
-    // }
-    // const float correction = fmin(dif, max_correction);
-    // _beats += correction;
+    const float current_intra_beat = intra_beat(_beats);
+    float dif = target_intra_beat - current_intra_beat;
+    const float max_correction = MAX_CORRECTION_PER_BEAT * dt_beats;
+    if (dif > 0.5) {
+      dif -= 1.0;
+    } else if (dif < -0.5) {
+      dif += 1.0;
+    }
+    const float correction = fmin(dif, max_correction);
+    _beats += correction;
   }
 };

@@ -50,7 +50,7 @@ namespace {
 
     Napi::Value to_js(const Napi::Env& env, std::vector<float> floatVector) {
         Napi::Array out = Napi::Array::New(env, floatVector.size());
-        for (auto i=0 ; i<floatVector.size() ; i++) {
+        for (size_t i=0 ; i<floatVector.size() ; i++) {
             out[i] = floatVector[i];
         }
         return out;

@@ -99,6 +99,7 @@ public:
       _buffer.write(sample);
     }
     _count += _config.frameCount;
+    _runningFrameCount += _config.frameCount;
   }
 
   // Be sure to read all hops after each write
@@ -119,10 +120,15 @@ public:
     return _reader;
   }
 
+  uint64_t runningFrameCount() {
+    return _runningFrameCount;
+  }
+
 private:
   ConnectionConfig _config;
   FrameReader _reader;
   CircularBuffer _buffer;
   std::vector<float> _hop;
-  uint32_t _count;
+  uint32_t _count = 0;
+  uint64_t _runningFrameCount = 0;
 };
