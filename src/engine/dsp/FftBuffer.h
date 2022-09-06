@@ -90,6 +90,8 @@ public:
     _reader.reset(config);
     _buffer.reset(std::max(_config.frameCount, HOP_SIZE) * 2);
     _hop.resize(HOP_SIZE);
+    _count = 0;
+    _runningFrameCount = 0;
   }
 
   // Write all frames
