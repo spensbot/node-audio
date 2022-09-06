@@ -67,11 +67,7 @@ public:
     }
     
     auto bpm = aubio_tempo_get_bpm(_ptrs->tempo);
-    uint64_t runningFrameCount = _fftBuffer.runningFrameCount();
-    uint64_t lastBeatFrameCount = aubio_tempo_get_last(_ptrs->tempo);
-    uint32_t framesSinceLastBeat = runningFrameCount - lastBeatFrameCount;
-    _outFramesSinceLastBeat.store(framesSinceLastBeat);
-    _outDelayFrameCount.store(aubio_tempo_get_delay(_ptrs->tempo));
+    uint32_t framesSinceLastBeat = _fftBuffer.runningFrameCount() - aubio_tempo_get_last(_ptrs->tempo);
     auto secondsSinceLastBeat = calc_seconds(framesSinceLastBeat, _config.sampleRate);
     auto bpmConfidence = aubio_tempo_get_confidence(_ptrs->tempo);
     auto dt_s = calc_seconds(_config.frameCount, _config.sampleRate);
@@ -83,10 +79,6 @@ public:
     _outBpmUnconfident.store(bpm);
     _outPitch.store(_ptrs->pitch_out->data[0]);
     _outPitchConfidence.store(aubio_pitch_get_confidence(_ptrs->pitch));
-
-    _outSecondsSinceLastBeat.store(secondsSinceLastBeat);
-    _outRunningFrameCount.store(runningFrameCount);
-    _outLastBeatFrameCount.store(lastBeatFrameCount);
 
     for (const auto sample : _fftBuffer.reader().readAvg()) {
       _rms.push(sample);
@@ -111,12 +103,6 @@ public:
   };
 
   SessionState sessionState() {
-    std::cout 
-    << _outRunningFrameCount.load() << " | " 
-    << _outLastBeatFrameCount.load() << " | " 
-    << _outDelayFrameCount.load() << " | " 
-    << _outFramesSinceLastBeat.load() << " | " 
-    << _outSecondsSinceLastBeat.load() << std::endl;
     return SessionState {
       _outBpm.load(),
       _outBeats.load(),
@@ -151,10 +137,4 @@ private:
   std::atomic<float> _outBpmConfidence;
   std::atomic<float> _outBpmUnconfident;
   std::vector<std::atomic<float>> _outPhaseVocoder;
-
-  std::atomic<float> _outSecondsSinceLastBeat;
-  std::atomic<uint64_t> _outRunningFrameCount;
-  std::atomic<uint64_t> _outLastBeatFrameCount;
-  std::atomic<uint32_t> _outFramesSinceLastBeat;
-  std::atomic<uint64_t> _outDelayFrameCount;
 };
