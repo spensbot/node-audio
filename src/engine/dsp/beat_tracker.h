@@ -54,14 +54,15 @@ private:
   }
 
   void correct_beats(float target_intra_beat, float dt_beats) {
-    const float current_intra_beat = intra_beat(_beats);
-    float dif = target_intra_beat - current_intra_beat;
-    const float max_correction = MAX_CORRECTION_PER_BEAT * dt_beats;
-    if (dif > 0.5) {
-      dif -= 1.0;
-    } else if (dif < -0.5) {
-      dif += 1.0;
-    }
-    _beats += fmin(dif, max_correction);
+    // const float current_intra_beat = intra_beat(_beats);
+    // float dif = target_intra_beat - current_intra_beat;
+    // const float max_correction = MAX_CORRECTION_PER_BEAT * dt_beats;
+    // if (dif > 0.5) {
+    //   dif -= 1.0;
+    // } else if (dif < -0.5) {
+    //   dif += 1.0;
+    // }
+    // const float correction = fmin(dif, max_correction);
+    // _beats += correction;
   }
 };
