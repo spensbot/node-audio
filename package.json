@@ -6,7 +6,7 @@
   "scripts": {
     "install": "make -C ./lib/aubio && node-gyp rebuild",
     "pretest": "tsc",
-    "test": "node --napi-modules ./test/test_binding.js",
+    "test": "npm run pretest && node --napi-modules ./test/test_binding.js",
     "start": "node-gyp rebuild && npm run test"
   },
   "gypfile": true,
@@ -25,6 +25,6 @@
   "description": "",
   "devDependencies": {
     "@types/node": "^7.0.22",
-    "typescript": "^2.3.3"
+    "typescript": "^3.9.10"
   }
 }
